@@ -1,0 +1,41 @@
+---
+container_time_zone: 'Europe/Amsterdam'
+container_lab__name: container_lab
+container_lab__image: ghcr.io/srl-labs/clab
+container_lab__port_http: 8000
+container_lab__home: "/opt/{{ container_lab__name }}"
+container_lab__remove_existing_container: false # DO NOT USE WHEN RUNNING PRODUCTION
+container_lab__pull_image: true
+container_lab__log_level: 'WARNING' # DEBUG  'INFO'    'WARNING'
+container_lab__network_mode: host
+container_lab__network_name: container_lab
+# container_lab__network_cidr: 172.16.20.0/26
+container_lab__pip_install_extra_args: ''
+container_lab__networks:
+  - name: "{{ container_lab__network_name }}"
+container_lab__env: {}
+container_lab__log_driver: json-file
+container_lab__log_options:
+container_lab__remove_existing_home_dir: false
+container_lab__directories:
+  - path: "{{ container_lab__home }}"
+    mode: "0760"
+    owner: "{{ container_lab__container_uid | default('root') }}"
+    group: "{{ container_lab__container_gid | default('root') }}"
+  - path: "{{ container_lab__home }}/config"
+    mode: "0760"
+    owner: "{{ container_lab__container_uid | default('root') }}"
+    group: "{{ container_lab__container_gid | default('root') }}"
+container_lab__ports:
+  - "{{ container_lab__port_http }}:8000"
+container_lab__directory_volumes:
+  - "{{ container_lab__home }}/config:{{ container_lab__home }}/config"
+  - "/var/lib/docker/containers:/var/lib/docker/containers"
+  - "/etc/hosts:/etc/hosts"
+  - "/var/run/netns:/var/run/netns"
+  - "/var/run/docker.sock:/var/run/docker.sock"
+container_lab__file_volumes: []
+container_lab__default_env:
+  TZ: "{{ container_time_zone | default('Europe/Paris') }}"
+  PUID: "{{ container_lab__container_uid | default(docker_uid) |default(1040) }}"
+  GUID: "{{ container_lab__container_gid | default(docker_gid) |default(1001) }}"
